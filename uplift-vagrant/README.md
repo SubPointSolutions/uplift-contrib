@@ -1,4 +1,4 @@
-# Using `invoke-vagrant` 
+# Using `uplift-vagrant` 
 
 The vagrant plugin provides a simplified configuration of DC, SQL, SharePoint and VS and designed to be used with uplift packer boxes.
 
