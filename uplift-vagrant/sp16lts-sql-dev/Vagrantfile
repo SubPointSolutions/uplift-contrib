@@ -44,22 +44,22 @@ Vagrant.configure("2") do |config|
     vm_config.vm.box = box_dc
 
     # standard config
-    uplift.uplift_synced_folder(vm_dc, vm_config)
-    uplift.uplift_2Gb(vm_dc, vm_config)
-    uplift.uplift_hostname(vm_dc, vm_config, vm_dc)
+    uplift.set_default_synced_folder(vm_dc, vm_config)
+    uplift.set_2Gb(vm_dc, vm_config)
+    uplift.set_hostname(vm_dc, vm_config, vm_dc)
     
     # always setup correct networking
-    uplift.uplift_private_dc_network(vm_dc, vm_config)
+    uplift.set_private_dc_network(vm_dc, vm_config)
     
     # uplift baseline
     if !uplift.has_checkpoint?(vm_dc, 'dsc-soe') 
-      uplift.uplift_win16_dsc_base(vm_dc, vm_config)
+      uplift.provision_win16_dsc_soe(vm_dc, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dsc-soe'
     end
 
     # uplift dc creation
     if !uplift.has_checkpoint?(vm_dc, 'dc-creation') 
-      uplift.uplift_dc16(vm_dc, vm_config)
+      uplift.provision_dc16(vm_dc, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dc-creation'
     end
 
@@ -93,26 +93,26 @@ Vagrant.configure("2") do |config|
     vm_config.vm.box_check_update = false
 
     # uplift - base config
-    uplift.uplift_synced_folder(vm_sql, vm_config)
-    uplift.uplift_6Gb(vm_sql, vm_config)
-    uplift.uplift_hostname(vm_sql, vm_config, vm_sql)   
+    uplift.set_default_synced_folder(vm_sql, vm_config)
+    uplift.set_6Gb(vm_sql, vm_config)
+    uplift.set_hostname(vm_sql, vm_config, vm_sql)   
 
     # uplift - network, base provision + dc join
-    uplift.uplift_client_network(vm_sql, vm_config, vm_sql)
+    uplift.set_client_network(vm_sql, vm_config, vm_sql)
 
     if !uplift.has_checkpoint?(vm_sql, 'dsc-soe') 
-      uplift.uplift_win16_dsc_base(vm_sql, vm_config)
+      uplift.provision_win16_dsc_soe(vm_sql, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dsc-soe'
     end
 
     if !uplift.has_checkpoint?(vm_sql, 'dc-join') 
-      uplift.uplift_dc_join(vm_sql, vm_config)
+      uplift.provision_dc_join(vm_sql, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dc-join'
     end
 
     # complete sql image
     if !uplift.has_checkpoint?(vm_sql, 'sql-complete-image') 
-        uplift.uplift_sql(vm_sql, vm_config)
+        uplift.provision_sql16_complete_image(vm_sql, vm_config)
         vm_config.vm.provision :uplift_checkpoint, name: 'sql-complete-image'
     end
 
@@ -147,45 +147,45 @@ Vagrant.configure("2") do |config|
     vm_config.vm.box_check_update = false
 
     # uplift - base config
-    uplift.uplift_synced_folder(vm_client, vm_config)
-    uplift.uplift_6Gb(vm_client, vm_config)
-    uplift.uplift_hostname(vm_client, vm_config, vm_client)   
+    uplift.set_default_synced_folder(vm_client, vm_config)
+    uplift.set_6Gb(vm_client, vm_config)
+    uplift.set_hostname(vm_client, vm_config, vm_client)   
 
     # uplift - network, base provision + dc join
-    uplift.uplift_client_network(vm_client, vm_config, vm_client)
+    uplift.set_client_network(vm_client, vm_config, vm_client)
 
     if !uplift.has_checkpoint?(vm_client, 'dsc-soe') 
-      uplift.uplift_win16_dsc_base(vm_client, vm_config)
+      uplift.provision_win16_dsc_soe(vm_client, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dsc-soe'
     end
 
     if !uplift.has_checkpoint?(vm_client, 'dc-join') 
-      uplift.uplift_dc_join(vm_client, vm_config)
+      uplift.provision_dc_join(vm_client, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dc-join'
     end
 
     # we use dedicated sql in this case
-    # uplift.uplift_sp16_farm_only() points to SQL server name, last param - vm_sql
+    # uplift.provision_sp16_single_server_farm() points to SQL server name, last param - vm_sql
 
     # # complete sql image
     # if !uplift.has_checkpoint?(vm_client, 'sql-complete-image') 
-    #     uplift.uplift_sql(vm_client, vm_config)
+    #     uplift.provision_sql16_complete_image(vm_client, vm_config)
     #     vm_config.vm.provision :uplift_checkpoint, name: 'sql-complete-image'
     # end
 
     # complete sharepoint install
     if !uplift.has_checkpoint?(vm_client, 'sp-farm-presetup') 
-      uplift.uplift_sp16_pre_setup(vm_client, vm_config)
+      uplift.provision_sp16_pre_setup(vm_client, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-presetup'
     end
 
     if !uplift.has_checkpoint?(vm_client, 'sp_farm_only') 
-      uplift.uplift_sp16_farm_only(vm_client, vm_config, vm_sql)
+      uplift.provision_sp16_single_server_farm(vm_client, vm_config, vm_sql)
       vm_config.vm.provision :uplift_checkpoint, name: 'sp_farm_only'
     end
 
     if !uplift.has_checkpoint?(vm_client, 'sp-farm-post-setup') 
-      uplift.uplift_sp16_farm_post_setup(vm_client, vm_config)
+      uplift.provision_sp16_farm_post_setup(vm_client, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-post-setup'
     end
 
