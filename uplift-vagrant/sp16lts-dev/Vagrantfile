@@ -23,6 +23,12 @@ vm_client = "sp16lts"
 # uplift helper for vagrant configurations
 uplift = VagrantPlugins::Uplift::Config()
 
+# network range where dc and other vms will be created
+# by default 192.168.4.*, use as following or skip it
+# be aware that two dc won't get along within the same network
+# use different networks for different stacks or one stack at a time
+uplift.set_network_range("192.168.16")
+
 Vagrant.configure("2") do |config|
   
   # additional plugins to be used with this vagrant config
@@ -117,20 +123,50 @@ Vagrant.configure("2") do |config|
         vm_config.vm.provision :uplift_checkpoint, name: 'sql-complete-image'
     end
 
+    if !uplift.has_checkpoint?(vm_client, 'sql16-optimize') 
+      uplift.provision_sql16_optimize(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sql16-optimize'
+    end
+
     # complete sharepoint install
     if !uplift.has_checkpoint?(vm_client, 'sp-farm-presetup') 
       uplift.provision_sp16_pre_setup(vm_client, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-presetup'
     end
 
-    if !uplift.has_checkpoint?(vm_client, 'sp_farm_only') 
-      uplift.provision_sp16_single_server_farm(vm_client, vm_config, vm_client)
-      vm_config.vm.provision :uplift_checkpoint, name: 'sp_farm_only'
+    if !uplift.has_checkpoint?(vm_client, 'sp-farm-presetup') 
+      uplift.provision_sp16_pre_setup(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-presetup'
     end
 
+    if !uplift.has_checkpoint?(vm_client, 'sp-accounts') 
+      uplift.provision_sp16_sp_accounts(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-accounts'
+    end
+
+    if !uplift.has_checkpoint?(vm_client, 'sp-sql-accounts') 
+      uplift.provision_sp16_sql_accounts(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-sql-accounts'
+    end
+
+    if !uplift.has_checkpoint?(vm_client, 'sp-single-farm') 
+      uplift.provision_sp16_single_server_farm(vm_client, vm_config, vm_client)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-single-farm'
+    end
+
+    if !uplift.has_checkpoint?(vm_client, 'sp-farm-services') 
+      uplift.provision_sp16_minimal_services(vm_client, vm_config, vm_client)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-services'
+    end
+    
     if !uplift.has_checkpoint?(vm_client, 'sp-farm-post-setup') 
       uplift.provision_sp16_farm_post_setup(vm_client, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-post-setup'
+    end
+
+    if !uplift.has_checkpoint?(vm_client, 'sp-web-app') 
+      uplift.provision_sp16_web_application(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-web-app'
     end
 
     # virtualbox tuning
