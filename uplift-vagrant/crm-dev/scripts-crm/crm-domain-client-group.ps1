@@ -25,6 +25,20 @@ Configuration Configure_CRMLocalAdminGroup {
                 "uplift\_ssrs"
             )
         }
+
+        # The account specified to run the Dynamics 365 application does not have Performance Counter permissions.
+        Group PerformanceLogUsers
+        {
+            GroupName  = "Performance Log Users"
+            MembersToInclude    = @(
+                "uplift\CRM01PrivUserGroup",
+                "uplift\_crmasync",
+                "uplift\_crmsrv",
+                "uplift\_crmdplsrv",
+                "uplift\_ssrs"
+            )
+        }
+        
     }
 }
 

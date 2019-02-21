@@ -10,6 +10,12 @@ $resourceName = Get-UpliftEnvVariable "UPLF_CRM_RESOURCE_NAME" "" "ms-dynamics-c
 $serverUrl    = Get-UpliftEnvVariable "UPLF_HTTP_ADDR"
 $uplifLocalRepository =  Get-UpliftEnvVariable "UPLF_LOCAL_REPOSITORY_PATH" "" "c:/_uplift_resources"
 
+# always turn into http, it might be 10.0.2.2 address only
+# uplift needs explicit http/https only
+if($serverUrl.ToLower().StartsWith("http") -eq $False) {
+    $serverUrl = "http://" + $serverUrl
+}
+
 Write-UpliftMessage "Downloading resource: $resourceName"
 pwsh -c Invoke-Uplift resource download-local $resourceName -server $serverUrl -repository $uplifLocalRepository
 
