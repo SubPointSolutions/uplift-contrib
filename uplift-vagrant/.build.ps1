@@ -1,16 +1,35 @@
-
-
-
 param(
     $vagrantFolder = "sp16lts-dev",
     
     $UPLF_VAGRANT_BOX_NAME = $null,
-    $UPLF_VBMANAGE_MACHINEFOLDER = $null
+    $UPLF_VBMANAGE_MACHINEFOLDER = $null,
+
+    $UPLF_HTTP_DIRECTORY = $null
 )
 
 $dirPath = $BuildRoot
 
 . "$dirPath/.build-helpers.ps1"
+
+
+Enter-Build {
+
+    $httpDirectoryPath = $UPLF_HTTP_DIRECTORY
+    if( $null -eq $httpDirectoryPath ) { $httpDirectoryPath = $env:UPLF_HTTP_DIRECTORY }
+
+    if( $null -ne $httpDirectoryPath ) {
+        Write-BuildInfoMessage "Starring local http server: $httpDirectoryPath"
+
+        $port = Get-RandomUsablePort
+        $httpServerJob  = Start-LocalHttpServer $port $httpDirectoryPath
+
+        $binAddress = ("10.0.2.2:" +  $port )
+        Write-BuildInfoMessage "Setting UPLF_BIN_REPO_HTTP_ADDR: $binAddress"
+        $ENV:UPLF_BIN_REPO_HTTP_ADDR = $binAddress
+    } else {
+        Write-BuildInfoMessage "Skipping local http server"
+    }    
+}
 
 # Synopsis: Tests newly created vagrant box
 task VagrantBoxTest {
