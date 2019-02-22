@@ -10,11 +10,8 @@ Write-UpliftEnv
 $packages = @(
 
     @{ 
-        Id = "InvokeUplift" 
-    },
-
-    @{ 
         Id = "Dynamics365Configuration"
+        Version = "1.0"
     },
 
     @{ 

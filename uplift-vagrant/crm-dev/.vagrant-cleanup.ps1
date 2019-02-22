@@ -1,1 +1,1 @@
-# vagrant destroy -f
+vagrant destroy -f
